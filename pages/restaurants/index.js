@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
 import { Navbar } from "../../components/NavBar";
 import { Footer } from "../../components/Footer";
+import Link from "next/link";
 
 export default function LoadRestaurants() {
   const [restaurants, setRestaurants] = useState([]);
@@ -26,7 +27,9 @@ export default function LoadRestaurants() {
         <title>Turismo DAW</title>
       </Helmet>
       <div className="flex flex-col h-full">
-        <h1 className="mt-20 text-3xl ml-20 uppercase">restaurantes de alicante</h1>
+        <h1 className="mt-20 text-3xl ml-20 uppercase">
+          restaurantes de alicante
+        </h1>
         <Navbar />
         <div className="grid grid-cols-3 p-1">
           {restaurants.map((restaurant, index) => {
@@ -51,7 +54,10 @@ export default function LoadRestaurants() {
                     <div className="mt-3 flex items-center">
                       <span className="text-sm font-semibold">Precio</span>
                       &nbsp;
-                      <span className="font-bold text-xl">{Math.floor(Math.random() * 35) + 25}</span>&nbsp;
+                      <span className="font-bold text-xl">
+                        {Math.floor(Math.random() * 35) + 25}
+                      </span>
+                      &nbsp;
                       <span className="text-sm font-semibold">€</span>
                     </div>
                   </div>
@@ -103,7 +109,13 @@ export default function LoadRestaurants() {
                     </svg>
                   </div>
                   <div>
-                    <button></button>
+                    <Link href={"restaurants/reviews?id=" + restaurant.id}>
+                      <a>
+                        <button className="bg-yellow-500 hover:bg-yellow-700 text-white text-center py-2 px-4 rounded-full">
+                          Reviews
+                        </button>
+                      </a>
+                    </Link>
                   </div>
                 </a>
               </>
