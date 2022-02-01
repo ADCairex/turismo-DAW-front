@@ -1,7 +1,7 @@
 @tailwind base;
+html, body {
+  width: 100%;
+  background-color: #f0f0f0;
+}
 @tailwind components;
 @tailwind utilities;
-
-h1 {
-  @apply: text-3xl font-bold;
-}
