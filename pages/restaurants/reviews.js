@@ -28,8 +28,6 @@ export default function LoadRestaurants() {
 
   const submitReview = (event) => {
     const idRestuarant = router.query.id;
-    const urlReviews =
-      "http://turismo-daw.com/rest/reviewByIdRestaurant/" + idRestuarant;
 
     event.preventDefault();
     let newReview = {
