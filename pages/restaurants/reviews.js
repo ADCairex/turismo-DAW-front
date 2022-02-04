@@ -38,12 +38,10 @@ export default function LoadRestaurants() {
   }, [router.isReady]);
 
   const deleteReview = (id, email) => {
-    console.log(email, username.email);
     let bodyArray = {
       review_id: id,
     };
     if (email == username.email) {
-      console.log("x");
       fetch("http://turismo-daw.com/rest/deleteReview", {
           method: "DELETE",
           headers: {
