@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import { Helmet } from "react-helmet";
 import { Navbar } from "../../components/NavBar";
 import { Footer } from "../../components/Footer";
@@ -8,9 +8,20 @@ export default function LoadRestaurants() {
   const router = useRouter();
   const [reviews, setReviews] = useState([]);
 
-  const [email, setEmail] = useState("");
   const [description, setDescription] = useState("");
   const [punctuation, setPunctuation] = useState(0);
+
+  const [userData, setUserData] = useState({
+    email: "Debes iniciar sesion primero",
+  });
+
+  const [username, setUsername] = useState({ username: "Anonimo", email: "" });
+
+  useEffect(async () => {
+    if (sessionStorage.getItem("userData")) {
+      setUsername(JSON.parse(sessionStorage.getItem("userData")));
+    }
+  }, []);
 
   useEffect(async () => {
     if (router.isReady) {
@@ -26,26 +37,55 @@ export default function LoadRestaurants() {
     }
   }, [router.isReady]);
 
+  const deleteReview = (id, email) => {
+    console.log(email, username.email);
+    let bodyArray = {
+      review_id: id,
+    };
+    if (email == username.email) {
+      console.log("x");
+      fetch("http://turismo-daw.com/rest/deleteReview", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bodyArray),
+        });
+    } else {
+      alert("Solo puedes eliminar tus reseñas");
+    }
+  };
+
   const submitReview = (event) => {
     const idRestuarant = router.query.id;
 
-    event.preventDefault();
-    let newReview = {
-      description: description,
-      punctuation: punctuation,
-      email: email,
-      restaurant_id: idRestuarant,
-    };
+    if (userData.email != "Debes iniciar sesion primero") {
+      event.preventDefault();
+      let newReview = {
+        description: description,
+        punctuation: punctuation,
+        email: userData.email,
+        restaurant_id: idRestuarant,
+      };
 
-    fetch("http://turismo-daw.com/rest/saveReview", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newReview),
-      mode: "no-cors",
-    });
+      fetch("http://turismo-daw.com/rest/saveReview", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newReview),
+      });
+    } else {
+      event.preventDefault();
+      alert("Para crear una review debes iniciar sesion");
+      Router.push("/auth/login");
+    }
   };
+  useEffect(async () => {
+    if (sessionStorage.getItem("userData")) {
+      setUserData(JSON.parse(sessionStorage.getItem("userData")));
+    }
+  }, []);
 
   return (
     <>
@@ -64,8 +104,57 @@ export default function LoadRestaurants() {
         <Navbar />
         <h1 className="mt-20 text-3xl ml-20 uppercase"></h1>
         <div className="flex flex-col w-4/5 m-auto">
+          <form
+            className="flex flex-col mt-20"
+            onSubmit={submitReview}
+            method="post"
+          >
+            <h2 className="mb-2">Nueva review:</h2>
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Email:
+            </label>
+
+            <input
+              name="email"
+              id="email"
+              placeholder="Email"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:shadow-outline"
+              value={userData.email}
+              readOnly="readonly"
+            />
+            <label
+              id="description"
+              className="block text-gray-700 text-sm font-bold mb-2"
+            >
+              Review:
+            </label>
+            <textarea
+              placeholder="Introduce tu opinion del restaurante..."
+              cols={50}
+              rows={5}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:shadow-outline"
+              onChange={(e) => setDescription(e.target.value)}
+            ></textarea>
+            <label>Puntuacion</label>
+            <select
+              name="punctuation"
+              id="punctuation"
+              onChange={(e) => setPunctuation(e.target.value)}
+            >
+              <option value={0}>0</option>
+              <option value={1}>1</option>
+              <option value={2}>2</option>
+              <option value={3}>3</option>
+              <option value={4}>4</option>
+              <option value={5}>5</option>
+            </select>
+            <button className="mb-20 mt-5 bg-yellow hover:bg-orange text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-min">
+              Enviar
+            </button>
+          </form>
           {reviews.map((review, index) => {
             let date = review.created_at.date.replace(".000000", "");
+
             return (
               <>
                 <div className="flex flex-row border-b-2">
@@ -114,52 +203,17 @@ export default function LoadRestaurants() {
                     </div>
                   </div>
                   <div className="w-3/5 m-3">{review.description}</div>
+                  <div>
+                    <a onClick={() => deleteReview(review.id, review.email)}>
+                      <button className="bg-red hover:bg-red-light text-white font-bold px-2 mt-3 rounded-full">
+                        X
+                      </button>
+                    </a>
+                  </div>
                 </div>
               </>
             );
           })}
-          <form className="flex flex-col mt-20" onSubmit={submitReview}>
-            <h2 className="mb-2">Nueva review:</h2>
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Email:
-            </label>
-            <input
-              name="email"
-              id="email"
-              placeholder="Email"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:shadow-outline"
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <label
-              id="description"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              Review:
-            </label>
-            <textarea
-              placeholder="Introduce tu opinion del restaurante..."
-              cols={50}
-              rows={5}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray leading-tight focus:outline-none focus:shadow-outline"
-              onChange={(e) => setDescription(e.target.value)}
-            ></textarea>
-            <label>Puntuacion</label>
-            <select
-              name="punctuation"
-              id="punctuation"
-              onChange={(e) => setPunctuation(e.target.value)}
-            >
-              <option value={0}>0</option>
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-              <option value={4}>4</option>
-              <option value={5}>5</option>
-            </select>
-            <button className="mb-20 mt-5 bg-yellow hover:bg-orange text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-min">
-              Enviar
-            </button>
-          </form>
         </div>
         <Footer />
       </div>

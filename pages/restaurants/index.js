@@ -35,7 +35,7 @@ export default function LoadRestaurants() {
           {restaurants.map((restaurant, index) => {
             return (
               <>
-                <a className="m-auto mt-5 c-card block bg-white shadow-md hover:shadow-xl rounded-lg overflow-hidden">
+                <a className="m-auto mt-5 c-card block bg-white shadow-md hover:shadow-xl rounded-lg overflow-hidden w-4/5">
                   <div className="relative pb-48 overflow-hidden">
                     <img
                       className="absolute inset-0 h-full w-full object-cover"

@@ -1,9 +1,46 @@
 import { Helmet } from "react-helmet";
 import { Navbar } from "../../components/NavBar";
 import { Footer } from "../../components/Footer";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
+import React, { useEffect, useState } from "react";
+import Router from "next/router";
 
 export default function Index() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
+
+  const submitReview = async (event) => {
+    event.preventDefault();
+    let newUser = {
+      username: username,
+      email: email,
+      password: pass,
+      name: name,
+      surname: surname,
+    };
+
+    await fetch("http://turismo-daw.com/rest/existUser/" + username).then(
+      (response) => {
+        if (response.statusText == "Usuario no encontrado") {
+          fetch("http://turismo-daw.com/rest/user", {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newUser),
+          });
+          Router.push("/auth/login");
+          alert("Usuario creado con exito");
+        } else {
+          alert("El nombre de usuario ya existe");
+        }
+      }
+    );
+  };
+
   return (
     <>
       <Helmet>
@@ -15,17 +52,23 @@ export default function Index() {
           <div className="max-w-md w-full space-y-8 mt-20">
             <div>
               <img
-                className="mx-auto h- w-auto"
+                className="mx-auto h-auto w-32"
                 src="https://seeklogo.com/images/A/alicante-ayuntamiento-logo-44A3C216DF-seeklogo.com.png"
                 alt="Workflow"
               />
             </div>
-            <form className="mt-8 space-y-6" action="#" method="POST">
-                <h2>Registro</h2>
+            <form
+              className="mt-8 space-y-6"
+              action="#"
+              method="POST"
+              onSubmit={submitReview}
+            >
+              <h2>Registro</h2>
               <input type="hidden" name="remember" value="true" />
               <div className="rounded-md shadow-sm -space-y-px">
                 <div>
                   <input
+                    onChange={(e) => setUsername(e.target.value)}
                     id="username"
                     name="username"
                     type="text"
@@ -36,6 +79,7 @@ export default function Index() {
                 </div>
                 <div>
                   <input
+                    onChange={(e) => setEmail(e.target.value)}
                     id="email"
                     name="email"
                     type="email"
@@ -46,6 +90,7 @@ export default function Index() {
                 </div>
                 <div>
                   <input
+                    onChange={(e) => setPass(e.target.value)}
                     id="password"
                     name="password"
                     type="password"
@@ -56,6 +101,7 @@ export default function Index() {
                 </div>
                 <div>
                   <input
+                    onChange={(e) => setName(e.target.value)}
                     id="name"
                     name="name"
                     type="text"
@@ -66,6 +112,7 @@ export default function Index() {
                 </div>
                 <div>
                   <input
+                    onChange={(e) => setSurname(e.target.value)}
                     id="surname"
                     name="surname"
                     type="text"
@@ -75,7 +122,6 @@ export default function Index() {
                   />
                 </div>
               </div>
-
               <div>
                 <button
                   type="submit"
@@ -96,7 +142,7 @@ export default function Index() {
                       />
                     </svg>
                   </span>
-                  Sign in
+                  Register
                 </button>
               </div>
             </form>
