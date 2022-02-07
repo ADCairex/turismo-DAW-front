@@ -49,6 +49,7 @@ export default function LoadRestaurants() {
           },
           body: JSON.stringify(bodyArray),
         });
+        window.location.reload(false);
     } else {
       alert("Solo puedes eliminar tus reseñas");
     }
@@ -73,6 +74,7 @@ export default function LoadRestaurants() {
         },
         body: JSON.stringify(newReview),
       });
+      window.location.reload(false);
     } else {
       event.preventDefault();
       alert("Para crear una review debes iniciar sesion");
@@ -162,6 +164,7 @@ export default function LoadRestaurants() {
                     <div className="flex flex-row">
                       Nota:
                       <div className="flex flex-row w-min m-auto">
+                    
                         <svg
                           viewBox="0 0 24 24"
                           xmlns="http://www.w3.org/2000/svg"

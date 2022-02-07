@@ -4,7 +4,15 @@ import { useEffect } from "react";
 import { useState } from "react/cjs/react.development";
 
 export const Navbar = () => {
-  const [userData, setUserData] = useState({username: 'Anonimo', email: ''});
+  const [userData, setUserData] = useState({ username: "Anonimo", email: "" });
+  const [iconWeather, setIconWeather] = useState("");
+
+  fetch("http://turismo-daw.com/rest/weather")
+    .then((response) => response.json())
+    .then((data) => {
+      setIconWeather("http://openweathermap.org/img/wn/" + data.icon + ".png");
+    });
+
   useEffect(async () => {
     if (sessionStorage.getItem("userData")) {
       setUserData(JSON.parse(sessionStorage.getItem("userData")));
@@ -52,6 +60,9 @@ export const Navbar = () => {
               <i class="fas fa-user"></i>
             </a>
           </Link>
+          <a className="flex flex-row text-white float-right text-2xl mr-10">
+            <img src={iconWeather} width="35"/>
+          </a>
         </div>
       </nav>
     </>
